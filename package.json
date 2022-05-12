@@ -1,13 +1,26 @@
 {
   "name": "task-warden",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Warden allows you to define taks that need to be only once or on a recurring schedule. It is built on top of a SQL persistence layer to ensure that tasks persist between restarts or failures. SQL was chosen for easy integration with exisiting infrastructure.",
   "main": "index.js",
+  "keywords": [
+    "sql",
+    "task",
+    "schedule",
+    "warden",
+    "task-warden",
+    "cron",
+    "job"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Aaron Leman",
-  "license": "ISC",
+  "author": "Aaron Leman <aaron.leman@lemanservices.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aaron-leman0619/warden.git"
+  },
   "dependencies": {
     "cron-parser": "^4.3.0",
     "luxon": "^2.3.2",

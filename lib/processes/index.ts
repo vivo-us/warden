@@ -23,8 +23,8 @@ export class Process {
     this.id = id;
     this.name = name;
     this.fn = fn;
-    this.maxWorkers = options?.maxWorkers ? options.maxWorkers : 1;
-    this.lockLifetime = options?.lockLifetime ? options.lockLifetime : 60000;
+    this.maxWorkers = options?.maxWorkers || 5;
+    this.lockLifetime = options?.lockLifetime || 60000;
     for (let i = 0; i < this.maxWorkers; i++) {
       this.workers.push(new Worker(i, this));
     }

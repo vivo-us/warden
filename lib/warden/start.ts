@@ -20,5 +20,3 @@ export default async function start(this: Warden, options?: Options) {
   process.nextTick(fillQueue.bind(this, "start"));
   logger.info("Warden started successfully");
 }
-
-// Need to figure out why the second iteration of fetching jobs will not force run. For some reasont the queue-filled event is being fired early.

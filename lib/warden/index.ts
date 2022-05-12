@@ -57,7 +57,7 @@ class Warden {
         options.db.password,
         {
           host: options.db.host,
-          port: options.db.port,
+          port: options.db.port || 3306,
           dialect: "mysql",
           logging: options.db.logging || false,
         }
@@ -68,8 +68,8 @@ class Warden {
     this.processing = false;
     this.initiated = false;
     this.processes = {};
-    this.frequency = options.frequency ? options.frequency : 300000;
-    this.maxConcurrent = options.maxConcurrent ? options.maxConcurrent : 10;
+    this.frequency = options.frequency || 300000;
+    this.maxConcurrent = options.maxConcurrent || 10;
     this.emitter.addListener("queue-filled", (jobsToRun: any[]) => {
       logger.info(`Queue filled. ${this.queue.queue.length} job(s) to run.`);
       this.processesToDistribute.push(jobsToRun);

@@ -18,16 +18,13 @@ interface Config {
 interface Options {
   runAt?: Date;
   cron?: string;
-  timezone?: string;
 }
 
 export async function schedule(
   this: Warden,
   process: Process,
   data: any,
-  options: Options = {
-    timezone: "UTC",
-  }
+  options: Options = {}
 ) {
   try {
     if (!this.initiated) throw new Error("Warden not initiated.");
@@ -42,7 +39,7 @@ export async function schedule(
     };
     if (options.cron) {
       config.recurrance = options.cron;
-      let cronFields = parseExpression(options.cron, { tz: options.timezone });
+      let cronFields = parseExpression(options.cron, { tz: "UTC" });
       config.nextRunAt = DateTime.fromJSDate(
         cronFields.next().toDate()
       ).toJSDate();
