@@ -27,7 +27,7 @@ import { Warden, Process } from "task-warden";
 const warden = new Warden({
   db: {
     name: "test",
-    host: "12.345.67.89",
+    host: "123.45.67.89",
     username: "foo",
     password: "bar",
     port: 3306,
@@ -59,57 +59,73 @@ await warden.stop();
 
 ## Warden
 
-### Database
+### Constructor Options
 
-_db.name_: Name of the database to be used.
+#### Database
 
-_db.host_: IP Address of the database or localhost.
+_db.name_ : Name of the database to be used.
 
-_db.username_: User to sign into the database with.
+_db.host_ : IP Address of the database or localhost.
 
-_db.password_: Password to sign into database with.
+_db.username_ : User to sign into the database with.
 
-_db.port_: Port number of the database, defaults to 3306. _Optional_
+_db.password_ : Password to sign into database with.
 
-_db.logging_: Whether or not [Sequelize](https://www.npmjs.com/package/sequelize). should log database calls. Defaults to false. _Optional_
+_db.port_ : Port number of the database. Defaults to `3306`. _Optional_
 
-### Other Options
+_db.logging_ : Whether or not [Sequelize](https://www.npmjs.com/package/sequelize) should log database calls. Defaults to `false`. _Optional_
 
-_frequency_: How often Warden should check the database for new tasks. _Optional_
+#### Other Options
 
-_maxConncurrent_: How many jobs should be allowed to run at the same time. _Optional_
+_frequency_ : How often Warden should check the database for new tasks. _Optional_
 
-## Process
+_maxConcurrent_ : How many jobs should be allowed to run at the same time. _Optional_
 
-### Parameters
+### Prototypes
 
-_processName_: Custom name for the process. Used to identify jobs for that process in the database.
+#### init()
 
-_function_: The function to execute when a job for this process runs.
+Initiates the database for the instance of warden.
 
-### Options
+#### start(options)
 
-_maxWorkers_: Maximum number of workers to execute tasks for a process. Default is 5. _Optional_
+Have the warden start processing jobs base on the frequency entered when the warden was created, the value passed in the options here, or the default of `300000`(ms).
 
-_lockLifetime_: How long warden should wait to try to re-fetch a job and try again. Default is 60000(ms). _Optional_
+_options.frequency_ : Number of ms between each fetch from the database.
 
-## Scheduling
+#### createProcess(name, function, options)
+
+_name_ : Custom name for the process. Used to identify jobs for that process in the database.
+
+_function_ : The function to execute when a job for this process runs.
+
+_options.maxWorkers_ : Maximum number of workers to execute tasks for a process. Defaults to `5`. _Optional_
+
+_options.lockLifetime_ : How long warden should wait to try to re-fetch a job and try again. Defaults to `60000`(ms). _Optional_
+
+#### schedule(process, data, options)
 
 NOTE: If no options are passed for scheduling, the task will execute immediately.
 
 It is possible to set both the `cron` and `runAt` values. If done, the `cron` info will be used for calculating future jobs and the `runAt` value when be when the first job runs. This can be useful for scheduling weekly or monthly tasks that you would like to execute the first job early on.
 
-### Parameters
+_process_ : A process object returned from the `createProcess` function.
 
-_process_: A process object returned from the `createProcess` function.
+_data_ : Any data to be passed to the function defined in the process to be executed.
 
-_data_: Any data to be passed to the function defined in the process to be executed.
+_options.runAt_ : A JavaScript date that the job should run at. _Optional_
 
-### Options
+_options.cron_ : A cron string defining how when the job should run. _Optional_
 
-_runAt_: A JavaScript date that the job should run at. _Optional_
+#### getJobs(options)
 
-_cron_: A cron string defining how when the job should run. _Optional_
+By default, all jobs that are either created, pending, or running are returned. The below filters can be used as well.
+
+_options.jobId_ : Id of the job you would like returned. _Optional_
+
+_options.processName_ : Name of the process you would like jobs returned for. _Optional_
+
+_optional.status_ : Job status(es) you would like returned jobs to match. Defaults to `["created", "pending", "running"]` _Optional_
 
 ## Contributing
 

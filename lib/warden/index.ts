@@ -1,13 +1,16 @@
-import { Process, ProcessOptions } from "./../processes/index";
-import { DateTime } from "luxon";
 import { EventEmitter } from "events";
 import { Sequelize } from "sequelize";
-import Queue from "../queue/index";
+import { DateTime } from "luxon";
+import { Process } from "../processes/index";
+import createProcess from "./createProcess";
+import { logger } from "../logging/logger";
 import { schedule } from "./scheduling";
+import distribute from "./distribute";
+import Queue from "../queue/index";
+import getJobs from "./getJobs";
 import init from "./init-db";
 import start from "./start";
 import stop from "./stop";
-import { logger } from "../logging/logger";
 
 export const emitter = new EventEmitter();
 interface Options {
@@ -43,7 +46,10 @@ class Warden {
   frequency: number;
   queue: Queue;
   nextScan: DateTime;
+  createProcess!: typeof createProcess;
+  distribute!: typeof distribute;
   schedule!: typeof schedule;
+  getJobs!: typeof getJobs;
   start!: typeof start;
   stop!: typeof stop;
   init!: typeof init;
@@ -73,68 +79,24 @@ class Warden {
     this.emitter.addListener("queue-filled", (jobsToRun: any[]) => {
       logger.info(`Queue filled. ${this.queue.queue.length} job(s) to run.`);
       this.processesToDistribute.push(jobsToRun);
-      this.distribute();
+      this.distribute.call(this);
     });
     this.emitter.addListener("job-ready", (jobName) => {
       logger.debug(`Job ${jobName} ready.`);
       this.processesToDistribute.push([jobName]);
-      this.distribute();
+      this.distribute.call(this);
     });
     this.emitter.addListener("worker-ready", (jobName) => {
       this.processesToDistribute.push([jobName]);
-      this.distribute();
+      this.distribute.call(this);
     });
-  }
-
-  createProcess(name: string, func: () => any, options?: ProcessOptions) {
-    try {
-      if (!this.initiated) throw new Error("Warden not initiated.");
-      let nextId = Object.keys(this.processes).length + 1;
-      let process = new Process(nextId, name, func, options);
-      this.processes[name] = process;
-      return process;
-    } catch (error: any) {
-      logger.error(error.message);
-      throw error;
-    }
-  }
-
-  distribute() {
-    try {
-      if (this.distributing) return;
-      this.distributing = true;
-      let more = true;
-      while (more) {
-        let array = this.processesToDistribute.shift();
-        if (!array) break;
-        let length = this.queue.queue.length;
-        if (length === 0) break;
-        for (let each in this.processes) {
-          if (!array.includes(each)) continue;
-          let freeWorkers = true;
-          while (freeWorkers) {
-            let freeWorker = this.processes[each].getNextFreeWorker();
-            if (freeWorker === null) break;
-            let job = this.queue.getNextJob(each);
-            if (!job) break;
-            this.emitter.emit("assigned", {
-              nextScan: this.nextScan,
-              job,
-              processName: each,
-              workerId: freeWorker,
-            });
-          }
-        }
-      }
-      this.distributing = false;
-    } catch (error: any) {
-      logger.error(error.message);
-      throw error;
-    }
   }
 }
 
+Warden.prototype.createProcess = createProcess;
+Warden.prototype.distribute = distribute;
 Warden.prototype.schedule = schedule;
+Warden.prototype.getJobs = getJobs;
 Warden.prototype.start = start;
 Warden.prototype.init = init;
 Warden.prototype.stop = stop;
