@@ -1,6 +1,6 @@
 {
   "name": "task-warden",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Warden allows you to define taks that need to be only once or on a recurring schedule. It is built on top of a SQL persistence layer to ensure that tasks persist between restarts or failures. SQL was chosen for easy integration with exisiting infrastructure.",
   "main": "index.js",
   "keywords": [
