@@ -7,6 +7,7 @@ import { logger } from "../logging/logger";
 import { schedule } from "./scheduling";
 import distribute from "./distribute";
 import Queue from "../queue/index";
+import getJobs from "./getJobs";
 import init from "./init-db";
 import start from "./start";
 import stop from "./stop";
@@ -48,6 +49,7 @@ class Warden {
   createProcess!: typeof createProcess;
   distribute!: typeof distribute;
   schedule!: typeof schedule;
+  getJobs!: typeof getJobs;
   start!: typeof start;
   stop!: typeof stop;
   init!: typeof init;
@@ -94,6 +96,7 @@ class Warden {
 Warden.prototype.createProcess = createProcess;
 Warden.prototype.distribute = distribute;
 Warden.prototype.schedule = schedule;
+Warden.prototype.getJobs = getJobs;
 Warden.prototype.start = start;
 Warden.prototype.init = init;
 Warden.prototype.stop = stop;
