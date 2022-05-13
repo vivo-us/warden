@@ -9,9 +9,7 @@ export default function createProcess(
   options?: ProcessOptions
 ) {
   try {
-    if (!this.initiated) throw new Error("Warden not initiated.");
-    let nextId = Object.keys(this.processes).length + 1;
-    let process = new Process(nextId, name, func, options);
+    let process = new Process(name, func, options);
     this.processes[name] = process;
     return process;
   } catch (error: any) {

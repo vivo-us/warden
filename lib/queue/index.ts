@@ -84,7 +84,7 @@ export default class Queue {
     if (index === -1) throw new Error(`Job ${jobId} not found for removal`);
     this.queue.splice(index, 1);
     this.jobsPending--;
-    logger.info(`${jobId} removed successfully`);
+    logger.debug(`${jobId} removed from queue`);
   }
 
   getNextJob(jobName: string): Job | undefined {

@@ -7,11 +7,7 @@ interface Options {
 }
 
 export default async function start(this: Warden, options?: Options) {
-  if (!this.initiated) {
-    throw new Error(
-      "Warden has not been initiated. Please call .init() first."
-    );
-  }
+  await this.initiated;
   if (options?.frequency) this.frequency = options.frequency;
   this.processInterval = setInterval(
     fillQueue.bind(this, "start-interval"),

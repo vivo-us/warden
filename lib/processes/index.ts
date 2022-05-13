@@ -6,7 +6,6 @@ export interface ProcessOptions {
 }
 
 export class Process {
-  id: number;
   workers: Worker[] = [];
   name: string;
   fn: (data: any) => any;
@@ -14,13 +13,7 @@ export class Process {
   busyWorkers: number = 0;
   lockLifetime: number;
   running: boolean = false;
-  constructor(
-    id: number,
-    name: string,
-    fn: () => any,
-    options?: ProcessOptions
-  ) {
-    this.id = id;
+  constructor(name: string, fn: () => any, options?: ProcessOptions) {
     this.name = name;
     this.fn = fn;
     this.maxWorkers = options?.maxWorkers || 5;

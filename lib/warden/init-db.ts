@@ -45,7 +45,7 @@ class Job extends Model<JobAttributes, JobInput> implements JobAttributes {
   updatedAt!: Date;
 }
 
-export default async function init(this: Warden) {
+export default function init(this: Warden) {
   Job.init(
     {
       jobId: {
@@ -74,8 +74,7 @@ export default async function init(this: Warden) {
       modelName: "job",
     }
   );
-  await this.database.sync();
-  this.initiated = true;
+  this.database.sync().then(() => this.emitter.emit("db-initiated"));
 }
 
 export { LastRunStatus, JobInput, JobOutput, JobAttributes, Job, JobStatus };

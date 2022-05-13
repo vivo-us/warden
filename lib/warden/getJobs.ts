@@ -24,7 +24,7 @@ interface Status {
 
 export default async function getJobs(this: Warden, options: Options = {}) {
   try {
-    if (!this.initiated) throw new Error("Warden not initiated.");
+    if (!this.processInterval) throw new Error("Warden not initiated.");
     if (options.status) {
       let values: Array<string> = Object.values(JobStatus);
       for (let each of options.status) {

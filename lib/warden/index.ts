@@ -8,6 +8,7 @@ import { schedule } from "./scheduling";
 import distribute from "./distribute";
 import Queue from "../queue/index";
 import getJobs from "./getJobs";
+import assign from "./assign";
 import init from "./init-db";
 import start from "./start";
 import stop from "./stop";
@@ -42,7 +43,7 @@ class Warden {
   processes: Processes;
   processing: boolean;
   database: Sequelize;
-  initiated: boolean;
+  initiated: Promise<unknown>;
   frequency: number;
   queue: Queue;
   nextScan: DateTime;
@@ -50,6 +51,7 @@ class Warden {
   distribute!: typeof distribute;
   schedule!: typeof schedule;
   getJobs!: typeof getJobs;
+  assign!: typeof assign;
   start!: typeof start;
   stop!: typeof stop;
   init!: typeof init;
@@ -72,7 +74,9 @@ class Warden {
     this.nextScan = DateTime.now();
     this.queue = new Queue();
     this.processing = false;
-    this.initiated = false;
+    this.initiated = new Promise((resolve) => {
+      this.emitter.on("db-initiated", resolve);
+    });
     this.processes = {};
     this.frequency = options.frequency || 300000;
     this.maxConcurrent = options.maxConcurrent || 10;
@@ -90,6 +94,7 @@ class Warden {
       this.processesToDistribute.push([jobName]);
       this.distribute.call(this);
     });
+    this.init();
   }
 }
 
@@ -97,6 +102,7 @@ Warden.prototype.createProcess = createProcess;
 Warden.prototype.distribute = distribute;
 Warden.prototype.schedule = schedule;
 Warden.prototype.getJobs = getJobs;
+Warden.prototype.assign = assign;
 Warden.prototype.start = start;
 Warden.prototype.init = init;
 Warden.prototype.stop = stop;
