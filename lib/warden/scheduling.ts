@@ -1,11 +1,10 @@
-import { logger } from "./../logging/logger";
-import Warden from ".";
-import { Process } from "../processes/index";
-import { DateTime } from "luxon";
-import { JobStatus } from "./../warden/init-db";
+import { Job as JobModel, JobStatus } from "./init-db";
+import Job, { JobConfig } from "../job/index";
 import { parseExpression } from "cron-parser";
-import { Job as JobModel } from "./init-db";
-import Job, { JobConfig } from "./../job";
+import { logger } from "../logging/logger";
+import { Process } from "../processes/index";
+import Warden from "../warden/index";
+import { DateTime } from "luxon";
 
 interface Config {
   name: string;

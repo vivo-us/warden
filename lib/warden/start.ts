@@ -1,6 +1,6 @@
-import Warden from ".";
-import fillQueue from "./fillQueue";
 import { logger } from "../logging/logger";
+import Warden from "../warden/index";
+import fillQueue from "./fillQueue";
 
 interface Options {
   frequency?: number;

@@ -1,10 +1,9 @@
-import { EventEmitter } from "events";
-import { JobStatus } from "./../warden/init-db";
-import Job from "../job";
-import { DateTime } from "luxon";
-import { Job as JobModel } from "../warden/init-db";
-import { emitter } from "../warden";
+import { Job as JobModel, JobStatus } from "../warden/init-db";
 import { logger } from "../logging/logger";
+import { emitter } from "../warden/index";
+import { EventEmitter } from "events";
+import { DateTime } from "luxon";
+import Job from "../job/index";
 
 export default class Queue {
   emitter: EventEmitter = emitter;

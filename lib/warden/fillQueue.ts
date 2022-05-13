@@ -1,10 +1,9 @@
-import { JobConfig } from "./../job/index";
-import { DateTime } from "luxon";
-import Warden from ".";
 import { JobOutput, Job as JobModel, JobStatus } from "./init-db";
-import Job from "../job";
-import { Op } from "sequelize";
+import Job, { JobConfig } from "../job/index";
 import { logger } from "../logging/logger";
+import Warden from "../warden/index";
+import { DateTime } from "luxon";
+import { Op } from "sequelize";
 
 export default async function fillQueue(this: Warden, context: string) {
   logger.debug(`Starting to fill queue for ${context}`);

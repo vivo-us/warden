@@ -1,7 +1,7 @@
+import { Process } from "../processes/index";
 import { JobStatus } from "../warden/init-db";
-import { DateTime } from "luxon";
-import { Process } from "./../processes/index";
 import { logger } from "../logging/logger";
+import { DateTime } from "luxon";
 
 export interface JobConfig {
   id: number;

@@ -1,6 +1,6 @@
-import Warden from ".";
 import { logger } from "../logging/logger";
 import { Job, JobStatus } from "./init-db";
+import Warden from "../warden/index";
 import { Op } from "sequelize";
 
 export interface Options {

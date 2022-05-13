@@ -1,5 +1,5 @@
 import { logger } from "../logging/logger";
-import Warden from ".";
+import Warden from "../warden/index";
 
 export default function distribute(this: Warden) {
   try {

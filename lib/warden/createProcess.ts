@@ -1,6 +1,6 @@
-import { Process, ProcessOptions } from "./../processes/index";
+import { Process, ProcessOptions } from "../processes/index";
 import { logger } from "../logging/logger";
-import Warden from ".";
+import Warden from "../warden/index";
 
 export default function createProcess(
   this: Warden,

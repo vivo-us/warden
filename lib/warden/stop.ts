@@ -1,5 +1,5 @@
-import Warden from ".";
 import { logger } from "../logging/logger";
+import Warden from "../warden/index";
 
 export default async function stop(this: Warden) {
   try {

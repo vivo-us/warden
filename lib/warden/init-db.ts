@@ -1,5 +1,5 @@
-import Warden from ".";
 import { Model, DataTypes, Optional } from "sequelize";
+import Warden from "../warden/index";
 
 enum JobStatus {
   Created = "created",
