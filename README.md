@@ -50,6 +50,12 @@ await warden.start({ frequency: 300000 });
 // Schedule the process to run at specific time
 await warden.schedule(process1, {}, { runAt: new Date() });
 
+// Update a Job
+await warden.updateJob(123, { data: "test1" });
+
+// Cancel a Job
+await warden.cancelJob(123);
+
 //Stop Warden from executing any further tasks.
 await warden.stop();
 ```
@@ -72,15 +78,18 @@ _db.logging_ : Whether or not [Sequelize](https://www.npmjs.com/package/sequeliz
 _frequency_ : How often Warden should check the database for new tasks. _Optional_\
 _maxConcurrent_ : How many jobs should be allowed to run at the same time. _Optional_
 
-## Starting Warden
+## Controlling Warden
 
 ### start(options)
 
 The `start()` method must be called before any process can be scheduled or executed.
-
 Have the warden start processing jobs base on the frequency entered when the warden was created, the value passed in the options here, or the default of `300000`(ms).
 
 _options.frequency_ : Number of ms between each fetch from the database.
+
+### stop()
+
+When called, `Warden` will no longer fetch new jobs and all jobs are removed from the queue. Any jobs that are currently running will still be completed.
 
 ## Defining Processes
 
@@ -135,6 +144,25 @@ _options.processName_ : Name of the process you would like jobs returned for. _O
 _options.status_ : Job status(es) you would like returned jobs to match. Defaults to `["created", "pending", "running"]` _Optional_
 
 Returns an array of `job` objects.
+
+## Updating Jobs
+
+### updateJob(jobId, options)
+
+NOTE: If both `cron` and `nextRunAt` options are passed, the job will run next at the date specified by `nextRunAt`, and then all future executions will be determined by the `cron` string.
+
+_jobId_ : Id of the job you would like to cancel.
+_options.cron_ : A cron string for recurring jobs. _Optional_
+_options.data_: Data that the job will pass to the process being executed. _Optional_
+_options.nextRunAt_ : A date object representing when the next job should run at. _Optional_
+
+## Cancelling Jobs
+
+### cancelJob(jobId)
+
+Removes the job from the queue and changes the status of the job in the database to `cancelled`.
+
+_jobId_ : Id of the job you would like to cancel.
 
 ## Contributing
 
