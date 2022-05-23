@@ -15,9 +15,14 @@ export default class Queue {
     this.jobsRunning = 0;
     this.queue = [];
     this.emitter.addListener("remove-job", (job) => this.remove(job.id));
-    this.emitter.addListener("job-updated", () => this.sort());
-    this.emitter.addListener("job-added", () => this.sort());
+    this.emitter.addListener("job-updated", this.handleQueueChange);
+    this.emitter.addListener("job-added", this.handleQueueChange);
   }
+
+  handleQueueChange = () => {
+    let jobsToRun = this.sort();
+    this.emitter.emit("queue-updated", jobsToRun);
+  };
 
   sort() {
     try {
@@ -61,6 +66,24 @@ export default class Queue {
     }
   }
 
+  update(job: Job) {
+    try {
+      for (let i = 0; i < this.queue.length; i++) {
+        if (this.queue[i].id !== job.id) continue;
+        if (this.queue[i].timeout) clearTimeout(this.queue[i].timeout);
+        this.queue[i] = job;
+        logger.debug(`${job.name} ${job.id} updated in queue`);
+        return;
+      }
+      this.queue.push(job);
+      this.jobsPending++;
+      logger.debug(`${job.name} ${job.id} added to queue`);
+    } catch (error: any) {
+      logger.error(error.message);
+      throw error;
+    }
+  }
+
   async cancel(jobId: number) {
     try {
       let index = this.queue.findIndex((job) => job.id === jobId);
@@ -79,9 +102,10 @@ export default class Queue {
     }
   }
 
-  remove(jobId: number) {
+  async remove(jobId: number, optional: boolean = false) {
     let index = this.queue.findIndex((each) => each.id === jobId);
-    if (index === -1) throw new Error(`Job ${jobId} not found for removal`);
+    if (index === -1 && !optional)
+      throw new Error(`Job ${jobId} not found for removal`);
     this.queue.splice(index, 1);
     this.jobsPending--;
     logger.debug(`${jobId} removed from queue`);
