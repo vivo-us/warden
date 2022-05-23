@@ -5,6 +5,7 @@ export default async function stop(this: Warden) {
   try {
     clearInterval(this.processInterval);
     this.processInterval = null;
+    this.queue.clear();
     logger.info("Warden stopped successfully");
   } catch (error) {
     logger.error("Waden encountered an error while stopping");

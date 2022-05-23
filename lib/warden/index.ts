@@ -5,12 +5,13 @@ import { Process } from "../processes/index";
 import createProcess from "./createProcess";
 import { logger } from "../logging/logger";
 import { schedule } from "./scheduling";
-import init, { Job } from "./init-db";
 import distribute from "./distribute";
 import updateJob from "./updateJob";
+import cancelJob from "./cancelJob";
 import Queue from "../queue/index";
 import getJobs from "./getJobs";
 import assign from "./assign";
+import init from "./init-db";
 import start from "./start";
 import stop from "./stop";
 
@@ -51,6 +52,7 @@ class Warden {
   createProcess!: typeof createProcess;
   distribute!: typeof distribute;
   updateJob!: typeof updateJob;
+  cancelJob!: typeof cancelJob;
   schedule!: typeof schedule;
   getJobs!: typeof getJobs;
   assign!: typeof assign;
@@ -103,21 +105,12 @@ class Warden {
     });
     this.init();
   }
-
-  async removeJob(jobId: number) {
-    try {
-      this.queue.cancel(jobId);
-      await Job.destroy({ where: { jobId } });
-    } catch (error) {
-      logger.error(error);
-      throw error;
-    }
-  }
 }
 
 Warden.prototype.createProcess = createProcess;
 Warden.prototype.distribute = distribute;
 Warden.prototype.updateJob = updateJob;
+Warden.prototype.cancelJob = cancelJob;
 Warden.prototype.schedule = schedule;
 Warden.prototype.getJobs = getJobs;
 Warden.prototype.assign = assign;

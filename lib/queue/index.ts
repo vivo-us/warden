@@ -84,28 +84,9 @@ export default class Queue {
     }
   }
 
-  async cancel(jobId: number) {
-    try {
-      let index = this.queue.findIndex((job) => job.id === jobId);
-      if (index === -1)
-        throw new Error(`Job ${jobId} not found for cancellation`);
-      if (this.queue[index].timeout) clearTimeout(this.queue[index].timeout);
-      this.queue.splice(index, 1);
-      await JobModel.update(
-        { status: JobStatus.Cancelled, nextRunAt: null },
-        { where: { jobId } }
-      );
-      this.jobsPending--;
-    } catch (error: any) {
-      logger.error(error.message);
-      throw error;
-    }
-  }
-
-  async remove(jobId: number, optional: boolean = false) {
+  async remove(jobId: number) {
     let index = this.queue.findIndex((each) => each.id === jobId);
-    if (index === -1 && !optional)
-      throw new Error(`Job ${jobId} not found for removal`);
+    if (index === -1) throw new Error(`Job ${jobId} not found for removal`);
     this.queue.splice(index, 1);
     this.jobsPending--;
     logger.debug(`${jobId} removed from queue`);
@@ -133,6 +114,18 @@ export default class Queue {
         }, diff);
         return undefined;
       }
+    } catch (error: any) {
+      logger.error(error.message);
+      throw error;
+    }
+  }
+
+  clear() {
+    try {
+      for (let job of this.queue) {
+        if (job.timeout) clearTimeout(job.timeout);
+      }
+      this.queue = [];
     } catch (error: any) {
       logger.error(error.message);
       throw error;

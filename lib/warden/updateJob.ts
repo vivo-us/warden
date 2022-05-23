@@ -5,7 +5,7 @@ import Warden from ".";
 import Job from "../job";
 
 interface UpdateConfig {
-  recurrance?: string;
+  cron?: string;
   data?: any;
   nextRunAt?: Date;
 }
@@ -16,9 +16,9 @@ async function updateJob(
   updateConfig: UpdateConfig
 ) {
   try {
-    let { recurrance, nextRunAt } = updateConfig;
-    if (recurrance && !nextRunAt) {
-      updateConfig.nextRunAt = parseExpression(recurrance, { tz: "UTC" })
+    let { cron, nextRunAt } = updateConfig;
+    if (cron && !nextRunAt) {
+      updateConfig.nextRunAt = parseExpression(cron, { tz: "UTC" })
         .next()
         .toDate();
     }
