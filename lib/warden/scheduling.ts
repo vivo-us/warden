@@ -58,6 +58,7 @@ export async function schedule(
     this.queue.add(jobInstance);
     this.emitter.emit("job-added");
     logger.info(`Job ${job.name} scheduled successfully.`);
+    return jobInstance;
   } catch (error: any) {
     throw new Error(`Warden failed to schedule job: ${error.message}`);
   }

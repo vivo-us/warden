@@ -39,6 +39,7 @@ async function updateJob(
     );
     this.queue.update(job);
     this.emitter.emit("job-updated", job);
+    return job;
   } catch (error) {
     logger.error(error);
     throw error;
