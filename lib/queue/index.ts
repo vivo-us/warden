@@ -86,7 +86,7 @@ export default class Queue {
 
   async remove(jobId: number) {
     let index = this.queue.findIndex((each) => each.id === jobId);
-    if (index === -1) throw new Error(`Job ${jobId} not found for removal`);
+    if (index === -1) return;
     this.queue.splice(index, 1);
     this.jobsPending--;
     logger.debug(`${jobId} removed from queue`);
