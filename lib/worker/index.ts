@@ -96,8 +96,10 @@ export default class Worker {
         };
         if (job.recurrance) {
           recurrance = DateTime.fromJSDate(
-            parseExpression(job.recurrance, { tz: "UTC" }).next().toDate()
-          );
+            parseExpression(job.recurrance, { tz: job.timezone })
+              .next()
+              .toDate()
+          ).toUTC();
           obj.nextRunAt = recurrance.toJSDate();
           if (this.nextScan && recurrance > this.nextScan) {
             this.emitter.emit("remove-job", job);

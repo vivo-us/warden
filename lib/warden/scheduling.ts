@@ -38,10 +38,10 @@ export async function schedule(
     };
     if (options.cron) {
       config.recurrance = options.cron;
-      let cronFields = parseExpression(options.cron, { tz: "UTC" });
-      config.nextRunAt = DateTime.fromJSDate(
-        cronFields.next().toDate()
-      ).toJSDate();
+      let cronFields = parseExpression(options.cron, { tz: this.timezone });
+      config.nextRunAt = DateTime.fromJSDate(cronFields.next().toDate())
+        .toUTC()
+        .toJSDate();
     }
     if (options.runAt) config.nextRunAt = options.runAt;
     let job = await JobModel.create(config);
@@ -49,6 +49,7 @@ export async function schedule(
       id: job.jobId,
       name: job.name,
       recurrance: job.recurrance,
+      timezone: this.timezone,
       data: job.data,
       status: job.status,
       nextRunAt: job.nextRunAt,

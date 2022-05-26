@@ -7,6 +7,7 @@ export interface JobConfig {
   id: number;
   name: string;
   recurrance: string | null;
+  timezone: string;
   data: any;
   status: JobStatus;
   nextRunAt: Date | null;
@@ -18,6 +19,7 @@ export default class Job {
   name: string;
   process: Process;
   recurrance: string | null;
+  timezone: string;
   data: any;
   status: JobStatus;
   nextRunAt: DateTime | null = null;
@@ -28,6 +30,7 @@ export default class Job {
     this.name = job.name;
     this.process = process;
     this.recurrance = job.recurrance;
+    this.timezone = job.timezone || "UTC";
     this.status = job.status;
     this.data = job.data;
     if (job.nextRunAt) {

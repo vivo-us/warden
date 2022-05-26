@@ -3,6 +3,7 @@ import { logger } from "./../logging/logger";
 import { Job as JobModel } from "./init-db";
 import Warden from ".";
 import Job from "../job";
+import { DateTime } from "luxon";
 
 interface UpdateConfig {
   cron?: string;
@@ -18,9 +19,11 @@ async function updateJob(
   try {
     let { cron, nextRunAt } = updateConfig;
     if (cron && !nextRunAt) {
-      updateConfig.nextRunAt = parseExpression(cron, { tz: "UTC" })
-        .next()
-        .toDate();
+      updateConfig.nextRunAt = DateTime.fromJSDate(
+        parseExpression(cron, { tz: this.timezone }).next().toDate()
+      )
+        .toUTC()
+        .toJSDate();
     }
     await JobModel.update(updateConfig, { where: { jobId } });
     let config = await JobModel.findByPk(jobId);
@@ -31,6 +34,7 @@ async function updateJob(
         name: config.name,
         data: config.data,
         recurrance: config.recurrance,
+        timezone: this.timezone,
         nextRunAt: config.nextRunAt,
         lockedAt: config.lockedAt,
         status: config.status,

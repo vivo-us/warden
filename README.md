@@ -77,6 +77,7 @@ _db.logging_ : Whether or not [Sequelize](https://www.npmjs.com/package/sequeliz
 
 _frequency_ : How often Warden should check the database for new tasks. _Optional_\
 _maxConcurrent_ : How many jobs should be allowed to run at the same time. _Optional_
+_timezone_ : Timezone to use for parsing cron expressions. Defaults to `"UTC"`. _Optional_
 
 ## Controlling Warden
 

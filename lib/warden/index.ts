@@ -20,6 +20,7 @@ interface Options {
   db: Database | Sequelize;
   frequency?: number;
   maxConcurrent?: number;
+  timezone?: string;
 }
 
 interface Database {
@@ -42,6 +43,7 @@ class Warden {
   emitter: EventEmitter = emitter;
   processInterval: any = null;
   maxConcurrent: number;
+  timezone: string;
   processes: Processes;
   processing: boolean;
   database: Sequelize;
@@ -75,6 +77,7 @@ class Warden {
         }
       );
     }
+    this.timezone = options.timezone || "UTC";
     this.nextScan = DateTime.now();
     this.queue = new Queue();
     this.processing = false;

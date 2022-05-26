@@ -40,12 +40,13 @@ export default async function fillQueue(this: Warden, context: string) {
         order: [["nextRunAt", "ASC"]],
         raw: true,
       });
-      if (!pendingJobs) return;
+      if (!pendingJobs || pendingJobs.length === 0) return;
       for (let each of pendingJobs) {
         let jobConfig: JobConfig = {
           id: each.jobId,
           name: each.name,
           recurrance: each.recurrance,
+          timezone: self.timezone,
           data: each.data,
           status: each.status,
           nextRunAt: each.nextRunAt,
