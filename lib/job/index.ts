@@ -53,7 +53,6 @@ export default class Job {
       let res = await this.process.fn(this.data);
       return res;
     } catch (error: any) {
-      logger.error(error.message);
       throw error;
     }
   }
