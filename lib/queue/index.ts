@@ -1,4 +1,4 @@
-import { Job as JobModel, JobStatus } from "../warden/init-db";
+import { JobStatus } from "../warden/init-db";
 import { logger } from "../logging/logger";
 import { emitter } from "../warden/index";
 import { EventEmitter } from "events";

@@ -17,6 +17,7 @@ interface Config {
 interface Options {
   runAt?: Date;
   cron?: string;
+  maxRetries?: number;
 }
 
 export async function schedule(
@@ -52,6 +53,7 @@ export async function schedule(
       timezone: this.timezone,
       data: job.data,
       status: job.status,
+      numberOfRetries: job.numberOfRetries,
       nextRunAt: job.nextRunAt,
       lockedAt: job.lockedAt,
     };

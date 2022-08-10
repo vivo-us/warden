@@ -38,6 +38,7 @@ async function updateJob(
         nextRunAt: config.nextRunAt,
         lockedAt: config.lockedAt,
         status: config.status,
+        numberOfRetries: config.numberOfRetries,
       },
       this.processes[config.name]
     );

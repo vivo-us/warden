@@ -10,6 +10,7 @@ export interface JobConfig {
   timezone: string;
   data: any;
   status: JobStatus;
+  numberOfRetries: number;
   nextRunAt: Date | null;
   lockedAt: Date | null;
 }
@@ -22,6 +23,7 @@ export default class Job {
   timezone: string;
   data: any;
   status: JobStatus;
+  numberOfRetries: number;
   nextRunAt: DateTime | null = null;
   lockedAt: DateTime | null = null;
   timeout: any | null = null;
@@ -32,6 +34,7 @@ export default class Job {
     this.recurrance = job.recurrance;
     this.timezone = job.timezone || "UTC";
     this.status = job.status;
+    this.numberOfRetries = job.numberOfRetries;
     this.data = job.data;
     if (job.nextRunAt) {
       this.nextRunAt = DateTime.fromJSDate(job.nextRunAt, {
@@ -51,7 +54,7 @@ export default class Job {
       return res;
     } catch (error: any) {
       logger.error(error.message);
-      return error;
+      throw error;
     }
   }
 }

@@ -27,6 +27,7 @@ export default async function fillQueue(this: Warden, context: string) {
           [Op.and]: [
             { status: { [Op.ne]: JobStatus.Cancelled } },
             { status: { [Op.ne]: JobStatus.Done } },
+            { status: { [Op.ne]: JobStatus.Failed } },
           ],
           [Op.or]: [
             {
@@ -49,6 +50,7 @@ export default async function fillQueue(this: Warden, context: string) {
           timezone: self.timezone,
           data: each.data,
           status: each.status,
+          numberOfRetries: each.numberOfRetries,
           nextRunAt: each.nextRunAt,
           lockedAt: each.lockedAt,
         };
@@ -62,9 +64,10 @@ export default async function fillQueue(this: Warden, context: string) {
         if (found) continue;
         self.queue.add(job);
         if (job.status !== JobStatus.Pending) {
+          if (job.status === JobStatus.Retry) job.numberOfRetries += 1;
           job.status = JobStatus.Pending;
           await JobModel.update(
-            { status: JobStatus.Pending },
+            { status: JobStatus.Pending, numberOfRetries: job.numberOfRetries },
             { where: { jobId: job.id } }
           );
         }

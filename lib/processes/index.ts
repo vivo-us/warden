@@ -3,6 +3,7 @@ import Worker from "../worker/index";
 export interface ProcessOptions {
   maxWorkers?: number;
   lockLifetime?: number;
+  maxRetries?: number;
 }
 
 export class Process {
@@ -10,6 +11,7 @@ export class Process {
   name: string;
   fn: (data: any) => any;
   maxWorkers: number;
+  maxRetries: number;
   busyWorkers: number = 0;
   lockLifetime: number;
   running: boolean = false;
@@ -17,6 +19,7 @@ export class Process {
     this.name = name;
     this.fn = fn;
     this.maxWorkers = options?.maxWorkers || 5;
+    this.maxRetries = options?.maxRetries || 0;
     this.lockLifetime = options?.lockLifetime || 60000;
     for (let i = 0; i < this.maxWorkers; i++) {
       this.workers.push(new Worker(i, this));

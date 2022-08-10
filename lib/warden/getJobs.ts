@@ -34,7 +34,9 @@ export default async function getJobs(this: Warden, options: Options = {}) {
       }
     }
     let statement: Statement = {
-      where: { status: { [Op.or]: ["created", "pending", "running"] } },
+      where: {
+        status: { [Op.or]: ["created", "pending", "retry", "running"] },
+      },
       order: [["nextRunAt", "ASC"]],
     };
     if (options.processName) statement.where.name = options.processName;

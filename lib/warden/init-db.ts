@@ -4,9 +4,11 @@ import Warden from "../warden/index";
 enum JobStatus {
   Created = "created",
   Pending = "pending",
+  Retry = "retry",
   Running = "running",
   Done = "done",
   Cancelled = "cancelled",
+  Failed = "failed",
 }
 
 enum LastRunStatus {
@@ -20,6 +22,7 @@ interface JobAttributes {
   recurrance?: string | null;
   data: any;
   status: JobStatus;
+  numberOfRetries?: number;
   lockedAt?: Date | null;
   nextRunAt?: Date | null;
   lastRunAt?: Date | null;
@@ -37,6 +40,7 @@ class Job extends Model<JobAttributes, JobInput> implements JobAttributes {
   recurrance!: string;
   data!: any;
   status!: JobStatus;
+  numberOfRetries!: number;
   lockedAt!: Date | null;
   nextRunAt!: Date | null;
   lastRunAt!: Date | null;
@@ -61,6 +65,7 @@ export default function init(this: Warden) {
         values: Object.values(JobStatus),
         defaultValue: JobStatus.Created,
       },
+      numberOfRetries: { type: DataTypes.INTEGER, defaultValue: 0 },
       nextRunAt: { type: DataTypes.DATE },
       lockedAt: { type: DataTypes.DATE },
       lastRunAt: { type: DataTypes.DATE },

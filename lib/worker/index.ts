@@ -42,7 +42,7 @@ export default class Worker {
     this.isRunning = true;
     this.nextScan = nextScan;
     logger.debug(`Worker ${this.id} starting job ${job.name} ${job.id}`);
-    let goodToGo = await this.lockJob(job.id);
+    let goodToGo = await this.lockJob(job);
     if (!goodToGo) {
       this.isRunning = false;
       logger.debug(`Job ${job.id} already locked`);
@@ -55,14 +55,18 @@ export default class Worker {
     this.emitter.emit("worker-ready", job.name);
   }
 
-  async lockJob(jobId: number) {
+  async lockJob(job: Job) {
     try {
+      if (job.status === JobStatus.Retry) job.numberOfRetries++;
       let [rowsAffected] = await JobModel.update(
         {
           status: JobStatus.Running,
           lockedAt: new Date(),
+          numberOfRetries: job.numberOfRetries,
         },
-        { where: { jobId: jobId, lockedAt: null } }
+        {
+          where: { jobId: job.id, lockedAt: null },
+        }
       );
       if (rowsAffected === 0) return false;
       else return true;
@@ -113,15 +117,31 @@ export default class Worker {
         }
         await JobModel.update(obj, { where: { jobId: job.id } });
       } else if (status === LastRunStatus.Failure) {
-        let obj: Obj = {
-          status: JobStatus.Done,
-          lockedAt: null,
-          lastRunAt: DateTime.now().toJSDate(),
-          lastRunStatus: status,
-          nextRunAt: null,
-        };
-        await JobModel.update(obj, { where: { jobId: job.id } });
-        this.emitter.emit("remove-job", job);
+        let shouldRetry = job.numberOfRetries < this.process.maxRetries;
+        if (shouldRetry) {
+          let obj: Obj = {
+            status: JobStatus.Retry,
+            lockedAt: null,
+            lastRunAt: DateTime.now().toJSDate(),
+            lastRunStatus: status,
+            nextRunAt: DateTime.now().toJSDate(),
+          };
+          await JobModel.update(obj, { where: { jobId: job.id } });
+          job.status = JobStatus.Retry;
+          job.lockedAt = null;
+          job.nextRunAt = DateTime.now();
+          this.emitter.emit("job-updated");
+        } else {
+          let obj: Obj = {
+            status: JobStatus.Failed,
+            lockedAt: null,
+            lastRunAt: DateTime.now().toJSDate(),
+            lastRunStatus: status,
+            nextRunAt: null,
+          };
+          await JobModel.update(obj, { where: { jobId: job.id } });
+          this.emitter.emit("remove-job", job);
+        }
       }
     } catch (error: any) {
       logger.error(error.message);
