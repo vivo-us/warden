@@ -4,6 +4,8 @@ Warden is a module designed to schedule and repeat jobs with a persistence layer
 
 This module is in its very early stages and will be updated to add more functionality such as compatibility with other SQL database types.
 
+The ability for the module to retry a job has been added in version 2.0.0. To migrate to this new version, a new column must be added to the database title "numberOfRetries" with a datatype of INT(11) and a default value of 0. This is a breaking change and it will not work with previous database tables unless they are migrated to the new schema.
+
 ## Installation
 
 This package can be installed through NPM.
@@ -41,6 +43,7 @@ const warden = new Warden({
 let process1 = warden.createProcess("test1", () => console.log("test1"), {
   maxWorkers: 5,
   lockLifetime: 60000,
+  maxRetries: 3,
 });
 
 // Start Warden
@@ -101,6 +104,7 @@ You may define a process either directly on the `warden` object with `createProc
 _name_ : Custom name for the process. Used to identify jobs for that process in the database.\
 _function_ : The function to execute when a job for this process runs.\
 _options.maxWorkers_ : Maximum number of workers to execute tasks for a process. Defaults to `5`. _Optional_\
+_options.maxRetries : Maximum number of times to retry a process. Defaults to `0`. \_Optional_\
 _options.lockLifetime_ : How long warden should wait to try to re-fetch a job and try again. Defaults to `60000`(ms). _Optional_
 
 Returns a `process` object.
