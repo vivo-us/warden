@@ -27,7 +27,6 @@ export async function schedule(
   options: Options = {}
 ) {
   try {
-    if (!this.processInterval) throw new Error("Warden not initiated.");
     if (!this.processes[process.name])
       throw new Error(`This warden does not own the process ${process.name}.`);
     let config: Config = {
