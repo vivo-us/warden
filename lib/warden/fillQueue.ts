@@ -58,6 +58,16 @@ export default async function fillQueue(this: Warden, context: string) {
         let found = false;
         for (let job of self.queue.queue) {
           if (job.id !== each.jobId) continue;
+          job.recurrance = each.recurrance;
+          job.data = each.data;
+          job.status = each.status;
+          job.numberOfRetries = each.numberOfRetries;
+          if (each.nextRunAt) {
+            job.nextRunAt = DateTime.fromJSDate(each.nextRunAt);
+          }
+          if (each.lockedAt) {
+            job.lockedAt = DateTime.fromJSDate(each.lockedAt);
+          }
           found = true;
           break;
         }
@@ -77,6 +87,15 @@ export default async function fillQueue(this: Warden, context: string) {
             { where: { jobId: job.id } }
           );
         }
+      }
+
+      // Removes any jobs that are no longer in the queue in the db
+
+      let jobIdList = pendingJobs.map((job) => job.jobId);
+      for (let each of self.queue.queue) {
+        if (each.process.name !== process.name || jobIdList.includes(each.id))
+          continue;
+        self.queue.remove(each.id);
       }
     } catch (error: any) {
       logger.error(error.message);
