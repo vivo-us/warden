@@ -99,6 +99,8 @@ When called, `Warden` will no longer fetch new jobs and all jobs are removed fro
 
 You may define a process either directly on the `warden` object with `createProcess()` or by creating a process with `new Process` and using the `assign()` method to assign it the warden.
 
+It is worth noting that if you would like an instance of warden to only schedule tasks in the database but not run them, you can do so by passing `0` to the `maxWorkers` option.
+
 ### createProcess(name, function, options)
 
 _name_ : Custom name for the process. Used to identify jobs for that process in the database.\
