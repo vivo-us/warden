@@ -1,13 +1,13 @@
 import { logger } from "../logging/logger";
 import Warden from "../warden/index";
 
-export default function distribute(this: Warden) {
+export default async function distribute(this: Warden) {
   try {
     if (this.distributing) return;
     this.distributing = true;
     let more = true;
     while (more) {
-      let array = this.processesToDistribute.shift();
+      let array = await this.processesToDistribute.shift();
       if (!array) break;
       let length = this.queue.queue.length;
       if (length === 0) break;

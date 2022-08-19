@@ -79,13 +79,16 @@ class Warden {
     }
     this.timezone = options.timezone || "UTC";
     this.nextScan = DateTime.now();
-    this.queue = new Queue();
     this.processing = false;
     this.initiated = new Promise((resolve) => {
       this.emitter.on("db-initiated", resolve);
     });
     this.processes = {};
     this.frequency = options.frequency || 300000;
+    this.queue = new Queue({
+      frequency: this.frequency,
+      nextRunAt: this.nextScan,
+    });
     this.maxConcurrent = options.maxConcurrent || 10;
     this.emitter.addListener("queue-filled", (jobsToRun: any[]) => {
       logger.info(`Queue filled. ${this.queue.queue.length} job(s) to run.`);
@@ -94,24 +97,24 @@ class Warden {
         this.distribute.call(this);
       }
     });
-    this.emitter.addListener("queue-updated", (jobsToRun: any[]) => {
+    this.emitter.addListener("queue-updated", async (jobsToRun: any[]) => {
       logger.info(`Queue Updated. ${this.queue.queue.length} job(s) to run.`);
       if (this.processing) {
         this.processesToDistribute.push(jobsToRun);
-        this.distribute.call(this);
+        await this.distribute.call(this);
       }
     });
-    this.emitter.addListener("job-ready", (jobName) => {
+    this.emitter.addListener("job-ready", async (jobName) => {
       logger.debug(`Job ${jobName} ready.`);
       if (this.processing) {
         this.processesToDistribute.push([jobName]);
-        this.distribute.call(this);
+        await this.distribute.call(this);
       }
     });
-    this.emitter.addListener("worker-ready", (jobName) => {
+    this.emitter.addListener("worker-ready", async (jobName) => {
       if (this.processing) {
         this.processesToDistribute.push([jobName]);
-        this.distribute.call(this);
+        await this.distribute.call(this);
       }
     });
     this.init();

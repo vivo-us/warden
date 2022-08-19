@@ -5,12 +5,21 @@ import { EventEmitter } from "events";
 import { DateTime } from "luxon";
 import Job from "../job/index";
 
+interface QueueData {
+  frequency: number;
+  nextRunAt: DateTime;
+}
+
 export default class Queue {
+  frequency: number;
+  nextRunAt: DateTime;
   emitter: EventEmitter = emitter;
   jobsPending: number;
   jobsRunning: number;
   queue: Array<Job>;
-  constructor() {
+  constructor(data: QueueData) {
+    this.frequency = data.frequency;
+    this.nextRunAt = data.nextRunAt;
     this.jobsPending = 0;
     this.jobsRunning = 0;
     this.queue = [];
@@ -19,12 +28,31 @@ export default class Queue {
     this.emitter.addListener("job-added", this.handleQueueChange);
   }
 
-  handleQueueChange = () => {
-    let jobsToRun = this.sort();
+  handleQueueChange = async () => {
+    let jobsToRun = await this.sort();
     this.emitter.emit("queue-updated", jobsToRun);
   };
 
-  sort() {
+  async sort() {
+    for (let each of this.queue) {
+      if (each.nextRunAt) {
+        if (each.nextRunAt.toJSDate() <= this.nextRunAt.toJSDate()) continue;
+        await this.remove(
+          each.id,
+          "Job will run after the next scan. Will fetch once closer to run time."
+        );
+        continue;
+      }
+      if (each.timeout) {
+        let timeoutTime = each.timeout._idleStart + each.timeout._idleTimeout;
+        if (timeoutTime <= this.nextRunAt.toJSDate()) continue;
+        await this.remove(
+          each.id,
+          "Job will run after the next scan. Will fetch once closer to run time."
+        );
+        continue;
+      }
+    }
     try {
       this.queue = this.queue.sort((a, b) => {
         let score = 0;
@@ -84,12 +112,12 @@ export default class Queue {
     }
   }
 
-  async remove(jobId: number) {
+  async remove(jobId: number, reason?: string) {
     let index = this.queue.findIndex((each) => each.id === jobId);
     if (index === -1) return;
     this.queue.splice(index, 1);
     this.jobsPending--;
-    logger.debug(`${jobId} removed from queue`);
+    logger.debug(`${jobId} removed from queue. ${reason ? reason : ""}`);
   }
 
   getNextJob(jobName: string): Job | undefined {
