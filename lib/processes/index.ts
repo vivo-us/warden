@@ -18,7 +18,8 @@ export class Process {
   constructor(name: string, fn: () => any, options?: ProcessOptions) {
     this.name = name;
     this.fn = fn;
-    this.maxWorkers = options?.maxWorkers || 5;
+    this.maxWorkers =
+      options?.maxWorkers !== undefined ? options.maxWorkers : 1;
     this.maxRetries = options?.maxRetries || 0;
     this.lockLifetime = options?.lockLifetime || 60000;
     for (let i = 0; i < this.maxWorkers; i++) {
