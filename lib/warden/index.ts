@@ -91,14 +91,26 @@ class Warden {
     });
     this.maxConcurrent = options.maxConcurrent || 10;
     this.emitter.addListener("queue-filled", (jobsToRun: any[]) => {
-      logger.info(`Queue filled. ${this.queue.queue.length} job(s) to run.`);
+      let qtyToRun = 0;
+      for (let each of jobsToRun) {
+        if (["created", "pending", "retry"].includes(each.status)) qtyToRun++;
+      }
+      if (qtyToRun) {
+        logger.info(`Queue filled. ${qtyToRun} job(s) to run.`);
+      }
       if (this.processing) {
         this.processesToDistribute.push(jobsToRun);
         this.distribute.call(this);
       }
     });
     this.emitter.addListener("queue-updated", async (jobsToRun: any[]) => {
-      logger.info(`Queue Updated. ${this.queue.queue.length} job(s) to run.`);
+      let qtyToRun = 0;
+      for (let each of jobsToRun) {
+        if (["created", "pending", "retry"].includes(each.status)) qtyToRun++;
+      }
+      if (qtyToRun) {
+        logger.info(`Queue Updated. ${qtyToRun} job(s) to run.`);
+      }
       if (this.processing) {
         this.processesToDistribute.push(jobsToRun);
         await this.distribute.call(this);

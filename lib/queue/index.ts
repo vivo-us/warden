@@ -35,6 +35,10 @@ export default class Queue {
 
   async sort() {
     for (let each of this.queue) {
+      if (!each.process.isActive) {
+        await this.remove(each.id, "Process inactive");
+        continue;
+      }
       if (each.nextRunAt) {
         if (each.nextRunAt.toJSDate() <= this.nextRunAt.toJSDate()) continue;
         await this.remove(

@@ -99,7 +99,7 @@ When called, `Warden` will no longer fetch new jobs and all jobs are removed fro
 
 You may define a process either directly on the `warden` object with `createProcess()` or by creating a process with `new Process` and using the `assign()` method to assign it the warden.
 
-It is worth noting that if you would like an instance of warden to only schedule tasks in the database but not run them, you can do so by passing `0` to the `maxWorkers` option.
+It is worth noting that if you would like an instance of warden to only schedule tasks in the database but not run them, you can do so by passing `false` to the `isActive` option.
 
 ### createProcess(name, function, options)
 
@@ -107,6 +107,7 @@ _name_ : Custom name for the process. Used to identify jobs for that process in 
 _function_ : The function to execute when a job for this process runs.\
 _options.maxWorkers_ : Maximum number of workers to execute tasks for a process. Defaults to `1`. _Optional_\
 _options.maxRetries : Maximum number of times to retry a process. Defaults to `0`. \_Optional_\
+_options.isActive : Whether or not the process is active and accepting jobs. Defaults to `true`. \_Optional_\
 _options.lockLifetime_ : How long warden should wait to try to re-fetch a job and try again. Defaults to `60000`(ms). _Optional_
 
 Returns a `process` object.
