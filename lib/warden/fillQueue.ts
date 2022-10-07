@@ -13,7 +13,7 @@ export default async function fillQueue(this: Warden, context: string) {
   this.nextScan = DateTime.now().plus({ milliseconds: this.frequency });
   this.queue.nextRunAt = this.nextScan;
   await Promise.allSettled(fetchList);
-  let jobsToRun = this.queue.sort();
+  let jobsToRun = await this.queue.sort();
   if (this.queue.queue.length > 0) this.emitter.emit("queue-filled", jobsToRun);
 
   async function fetchJobs(jobName: string) {

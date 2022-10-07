@@ -34,29 +34,33 @@ export default class Queue {
   };
 
   async sort() {
+    let idsToRemove = [];
     for (let each of this.queue) {
       if (!each.process.isActive) {
-        await this.remove(each.id, "Process inactive");
+        idsToRemove.push({ id: each.id, reason: "Process inactive" });
         continue;
       }
       if (each.nextRunAt) {
         if (each.nextRunAt.toJSDate() <= this.nextRunAt.toJSDate()) continue;
-        await this.remove(
-          each.id,
-          "Job will run after the next scan. Will fetch once closer to run time."
-        );
+        idsToRemove.push({
+          id: each.id,
+          reason:
+            "Job will run after the next scan. Will fetch once closer to run time.",
+        });
         continue;
       }
       if (each.timeout) {
         let timeoutTime = each.timeout._idleStart + each.timeout._idleTimeout;
         if (timeoutTime <= this.nextRunAt.toJSDate()) continue;
-        await this.remove(
-          each.id,
-          "Job will run after the next scan. Will fetch once closer to run time."
-        );
+        idsToRemove.push({
+          id: each.id,
+          reason:
+            "Job will run after the next scan. Will fetch once closer to run time.",
+        });
         continue;
       }
     }
+    for (let each of idsToRemove) await this.remove(each.id, each.reason);
     try {
       this.queue = this.queue.sort((a, b) => {
         let score = 0;
