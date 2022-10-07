@@ -92,7 +92,7 @@ class Warden {
     this.maxConcurrent = options.maxConcurrent || 10;
     this.emitter.addListener("queue-filled", (jobsToRun: any[]) => {
       if (this.queue.queue.length) {
-        logger.info(`Queue filled. ${this.queue.queue.length} job(s) to run.`);
+        logger.debug(`Queue filled. ${this.queue.queue.length} job(s) to run.`);
       }
       if (this.processing) {
         this.processesToDistribute.push(jobsToRun);
@@ -101,7 +101,9 @@ class Warden {
     });
     this.emitter.addListener("queue-updated", async (jobsToRun: any[]) => {
       if (this.queue.queue.length) {
-        logger.info(`Queue Updated. ${this.queue.queue.length} job(s) to run.`);
+        logger.debug(
+          `Queue Updated. ${this.queue.queue.length} job(s) to run.`
+        );
       }
       if (this.processing) {
         this.processesToDistribute.push(jobsToRun);

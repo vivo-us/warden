@@ -12,7 +12,7 @@ export default async function cancel(this: Warden, jobId: number) {
     if (rowsAffected === 0) {
       throw new Error(`Job ${jobId} not found for cancellation.`);
     }
-    logger.info(`Job ${jobId} cancelled successfully`);
+    logger.debug(`Job ${jobId} cancelled successfully`);
   } catch (error) {
     logger.error(error);
     throw error;
