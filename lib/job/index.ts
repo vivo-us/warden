@@ -2,6 +2,7 @@ import { Process } from "../processes/index";
 import { JobStatus } from "../warden/init-db";
 import { logger } from "../logging/logger";
 import { DateTime } from "luxon";
+import { Job as JobModel } from "../warden/init-db";
 
 export interface JobConfig {
   id: number;
@@ -49,10 +50,22 @@ export default class Job {
   }
 
   async run() {
+    let interval = setInterval(async () => {
+      try {
+        await JobModel.update(
+          { lockedAt: new Date() },
+          { where: { jobId: this.id } }
+        );
+      } catch (error) {
+        logger.error(error);
+      }
+    }, this.process.lockLifetime / 2);
     try {
       let res = await this.process.fn(this.data);
+      clearInterval(interval);
       return res;
     } catch (error: any) {
+      clearInterval(interval);
       throw error;
     }
   }

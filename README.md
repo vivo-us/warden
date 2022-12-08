@@ -63,6 +63,8 @@ await warden.cancelJob(123);
 await warden.stop();
 ```
 
+NOTE: To see more verbose logging, you may add the env var `WARDEN_LOG_LEVEL` and assign it one of the `Winston` log levels. Otherwise it will default to info.
+
 ## Warden Constructor Options
 
 The constructor will automatically initiate a database connection and create a `job` table if one does not exist. Once initiated, it will emit a `db-initialized` event, which the `start()` event automatically handles and waits for. You may listen for this event and others on `warden.emitter`.

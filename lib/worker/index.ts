@@ -47,6 +47,7 @@ export default class Worker {
     if (!goodToGo) {
       this.isRunning = false;
       logger.debug(`Job ${job.id} already locked`);
+      this.emitter.emit("remove-job", job);
       return;
     }
     logger.debug(`Worker ${this.id} executing job ${job.name} ${job.id}`);
